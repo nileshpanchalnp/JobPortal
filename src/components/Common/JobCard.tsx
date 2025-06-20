@@ -10,13 +10,13 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, showBookmark = true }: JobCardProps) {
-  const { user, bookmarkJob, bookmarkedJobs } = useAuth();
-  const isBookmarked = bookmarkedJobs.includes(job.id);
+const { user, bookmarkJob, bookmarkedJobs } = useAuth();
+const isBookmarked = bookmarkedJobs?.includes(job._id) ?? false;
 
   const handleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     if (user?.role === 'candidate') {
-      bookmarkJob(job.id);
+      bookmarkJob(job._id);
     }
   };
 
@@ -88,9 +88,9 @@ export default function JobCard({ job, showBookmark = true }: JobCardProps) {
           <span className="text-xs text-gray-500">
             Posted {new Date(job.postedDate).toLocaleDateString()}
           </span>
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Link to={`/job/${job._id}`}className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             View Details
-          </div>
+         </Link>
         </div>
       </div>
     </Link>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Clock, DollarSign, Heart, Building2, Calendar, Users, Upload, CheckCircle, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Heart, Building2,  Users, Upload, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function JobDetails() {
@@ -10,8 +10,8 @@ export default function JobDetails() {
   const [resume, setResume] = useState<File | null>(null);
   const [coverLetter, setCoverLetter] = useState('');
 
-  const job = jobs.find(j => j.id === id);
-  const isBookmarked = bookmarkedJobs.includes(id || '');
+  const job = jobs.find(j => j._id === id);
+const isBookmarked = bookmarkedJobs.includes(job?._id || '');
   const hasApplied = applications.some(app => app.jobId === id && app.candidateId === user?.id);
 
   if (!job) {
@@ -29,18 +29,22 @@ export default function JobDetails() {
 
   const handleBookmark = () => {
     if (user?.role === 'candidate') {
-      bookmarkJob(job.id);
+      bookmarkJob(job._id);
     }
   };
 
   const handleApply = () => {
-    if (resume || coverLetter) {
-      applyToJob(job.id, resume || undefined);
-      setShowApplyModal(false);
-      setResume(null);
-      setCoverLetter('');
-    }
-  };
+  if (!job._id) {
+    console.error("Job ID missing!");
+    return;
+  }
+  if (resume || coverLetter) {
+    applyToJob(job._id, resume || undefined);
+    setShowApplyModal(false);
+    setResume(null);
+    setCoverLetter('');
+  }
+};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

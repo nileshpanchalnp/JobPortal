@@ -6,7 +6,10 @@ import JobCard from '../components/Common/JobCard';
 
 export default function SavedJobs() {
   const { jobs, bookmarkedJobs } = useAuth();
-  const savedJobs = jobs.filter(job => bookmarkedJobs.includes(job.id));
+const savedJobs = jobs.filter(job => {
+  const jobId = job._id || job.id;
+  return (bookmarkedJobs ?? []).includes(jobId);
+});
 
   return (
     <div className="min-h-screen bg-gray-50">

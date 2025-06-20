@@ -14,7 +14,7 @@ export interface User {
 }
 
 export interface Job {
-  _id?:string
+  _id?: string
   id: string;
   title: string;
   company: string;
@@ -31,6 +31,7 @@ export interface Job {
 export interface Application {
   id: string;
   jobId: string;
+  _jobId: string;
   candidateId: string;
   status: 'pending' | 'reviewed' | 'accepted' | 'rejected';
   appliedDate: string;
@@ -73,9 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { token, user } = response.data;
 
       if (token && user) {
-    localStorage.setItem('token', token);
-localStorage.setItem('user', JSON.stringify(user));
-setUser(user);
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
         return true;
       }
 
@@ -86,44 +87,44 @@ setUser(user);
     }
   };
 
-const register = async (name: string, email: string, password: string, role: UserRole): Promise<boolean> => {
-  try {
-    const response = await axios.post('http://localhost:5000/User/register', {
-      name,
-      email,
-      password,
-      role
-    });
+  const register = async (name: string, email: string, password: string, role: UserRole): Promise<boolean> => {
+    try {
+      const response = await axios.post('http://localhost:5000/User/register', {
+        name,
+        email,
+        password,
+        role
+      });
 
-    const { token, user, message } = response.data;
+      const { token, user, message } = response.data;
 
-    // ✅ Optional: Show success toast
-    toast.success(message || 'Registration successful!');
+      // ✅ Optional: Show success toast
+      toast.success(message || 'Registration successful!');
 
-    // ✅ Store token
-    localStorage.setItem('token', token);
-localStorage.setItem('user', JSON.stringify(user));
-setUser(user);
+      // ✅ Store token
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
 
-    return true;
-  } catch (error: any) {
-    // ✅ Optional: Show error toast if message available
-    const errorMessage = error?.response?.data?.message || 'Registration failed';
-    toast.error(errorMessage);
+      return true;
+    } catch (error: any) {
+      // ✅ Optional: Show error toast if message available
+      const errorMessage = error?.response?.data?.message || 'Registration failed';
+      toast.error(errorMessage);
 
-    console.error('Registration failed:', error);
-    return false;
-  }
-};
+      console.error('Registration failed:', error);
+      return false;
+    }
+  };
 
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  const storedUser = localStorage.getItem('user');
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
 
-  if (token && storedUser) {
-    setUser(JSON.parse(storedUser));
-  }
-}, []);
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const logout = () => {
     localStorage.removeItem('token')
@@ -144,84 +145,242 @@ useEffect(() => {
   };
 
   const fetchJobs = async () => {
-  try {
-    const response = await axios.get("http://localhost:5000/company/get");
-    const data = response.data;
-    if (Array.isArray(data)) {
-      setJobs(data);
-    } else if (Array.isArray(data.jobs)) {
-      setJobs(data.jobs);
-    } else {
-      console.error("Unexpected jobs response format:", data);
-      setJobs([]);
-      toast.error("Unexpected jobs data format");
+    try {
+      const response = await axios.get("http://localhost:5000/company/get");
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else if (Array.isArray(data.jobs)) {
+        setJobs(data.jobs);
+      } else {
+        console.error("Unexpected jobs response format:", data);
+        setJobs([]);
+        toast.error("Unexpected jobs data format");
+      }
+    } catch (error) {
+      console.error("Failed to fetch jobs:", error);
+      toast.error("Failed to fetch jobs");
     }
-  } catch (error) {
-    console.error("Failed to fetch jobs:", error);
-    toast.error("Failed to fetch jobs");
-  }
-};
+  };
   useEffect(() => {
     fetchJobs(); // load jobs from backend again on reload
   }, []);
 
 
-const updateJob = async (id: string, jobData: Partial<Job>) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await axios.put(`http://localhost:5000/company/update/${id}`, jobData, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setJobs(prev => prev.map(job => job.id === id ? response.data.updatedCompany : job));
-    toast.success("Job updated successfully!");
-  } catch (error) {
-    console.error("Failed to update job:", error);
-    toast.error("Failed to update job");
-  }
-};
-
-const deleteJob = async (id: string) => {
-  try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`http://localhost:5000/company/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setJobs(prev => prev.filter(job => job.id !== id));
-    setApplications(prev => prev.filter(app => app.jobId !== id));
-    toast.success("Job deleted successfully!");
-  } catch (error) {
-    console.error("Failed to delete job:", error);
-    toast.error("Failed to delete job");
-  }
-};
-
-  const applyToJob = (jobId: string, resume?: File) => {
-    if (!user) return;
-
-    const newApplication: Application = {
-      id: Date.now().toString(),
-      jobId,
-      candidateId: user.id,
-      status: 'pending',
-      appliedDate: new Date().toISOString().split('T')[0],
-      ...(resume && { resume: resume.name })
-    };
-    setApplications(prev => [...prev, newApplication]);
+  const updateJob = async (id: string, jobData: Partial<Job>) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(`http://localhost:5000/company/update/${id}`, jobData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setJobs(prev => prev.map(job => job.id === id ? response.data.updatedCompany : job));
+      toast.success("Job updated successfully!");
+    } catch (error) {
+      console.error("Failed to update job:", error);
+      toast.error("Failed to update job");
+    }
   };
 
-  const bookmarkJob = (jobId: string) => {
-    setBookmarkedJobs(prev =>
-      prev.includes(jobId)
-        ? prev.filter(id => id !== jobId)
-        : [...prev, jobId]
+  const deleteJob = async (id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:5000/company/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log("Deleting company ID:", id);
+      setJobs(prev => prev.filter(job => job.id !== id));
+      setApplications(prev => prev.filter(app => app.jobId !== id));
+      toast.success("Job deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete job:", error);
+      toast.error("Failed to delete job");
+    }
+  };
+
+const applyToJob = async (jobId: string, resume?: File) => {
+  if (!user) return;
+
+  try {
+    const formData = new FormData();
+    formData.append("jobId", jobId);
+    if (resume) formData.append("resume", resume);
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post("http://localhost:5000/candidate/apply", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    toast.success(response.data.message || "Application submitted!");
+  } catch (error) {
+    console.error("Apply error:", error);
+    toast.error("Failed to apply to job");
+  }
+};
+
+const fetchApplications = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get("http://localhost:5000/candidate/my-applications", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const { applications } = response.data;
+
+    // If response has _id instead of id, normalize:
+    const formatted = applications.map((app: any) => ({
+      id: app._id,
+      jobId: typeof app.jobId === "object" ? app.jobId._id : app.jobId,
+      candidateId: app.candidateId,
+      status: app.status,
+      resume: app.resume,
+      appliedDate: app.appliedDate?.split("T")[0] || new Date().toISOString().split("T")[0],
+    }));
+
+    setApplications(formatted);
+  } catch (error) {
+    console.error("Failed to fetch applications:", error);
+    toast.error("Could not fetch applications.");
+  }
+};
+
+useEffect(() => {
+  fetchJobs();
+  if (user?.role === 'candidate') {
+    fetchApplications();
+  }
+}, [user]);
+
+const fetchCompanyApplications = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get("http://localhost:5000/candidate/company-applications", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const { applications } = response.data;
+
+    const formatted = applications.map((app: any) => ({
+      id: app._id,
+      jobId: typeof app.jobId === "object" ? app.jobId._id : app._jobId,
+      candidateId: app.candidateId,
+      status: app.status,
+      resume: app.resume,
+      appliedDate: app.appliedDate?.split("T")[0] || new Date().toISOString().split("T")[0],
+    }));
+
+    setApplications(formatted);
+  } catch (error) {
+    console.error("Failed to fetch company applications:", error);
+    toast.error("Could not load company applications");
+  }
+};
+
+useEffect(() => {
+  fetchJobs();
+
+  if (user?.role === "candidate") {
+    fetchApplications();
+  } else if (user?.role === "company") {
+    fetchCompanyApplications();
+  }
+}, [user]);
+
+const bookmarkJob = async (jobId: string) => {
+  if (!user || user.role !== "candidate") return;
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+      "http://localhost:5000/bookmark/toggle",
+      { jobId }, // ✅ jobId sent in body as JSON
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // ✅ ensure it's JSON
+        },
+      }
     );
-  };
 
-  const updateApplicationStatus = (applicationId: string, status: Application['status']) => {
+    const { bookmarks } = response.data;
+
+    const normalizedBookmarks = bookmarks.map((job: any) =>
+      typeof job === "string" ? job : job._id || job.id
+    );
+
+    setBookmarkedJobs(normalizedBookmarks);
+    toast.success("Bookmark updated!");
+  } catch (error: any) {
+    console.error("Bookmark error:", error.response?.data || error.message);
+    toast.error("Failed to update bookmark");
+  }
+};
+
+
+
+const fetchBookmarks = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get("http://localhost:5000/bookmark/get", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const { bookmarks } = response.data;
+    setBookmarkedJobs(bookmarks);
+  } catch (error) {
+    console.error("Failed to fetch bookmarks:", error);
+    toast.error("Could not load bookmarks");
+  }
+};
+
+useEffect(() => {
+  fetchJobs();
+
+  if (user?.role === "candidate") {
+    fetchApplications();
+    fetchBookmarks(); // 👈 Fetch bookmarks
+  } else if (user?.role === "company") {
+    fetchCompanyApplications();
+  }
+}, [user]);
+
+
+const updateApplicationStatus = async (applicationId: string, status: Application['status']) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.put(
+      `http://localhost:5000/candidate/update-status/${applicationId}`,
+      { status },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const updatedApp = response.data.updatedApp;
+
+    // Update state
     setApplications(prev =>
-      prev.map(app => app.id === applicationId ? { ...app, status } : app)
+      prev.map(app => app.id === applicationId ? { ...app, status: updatedApp.status } : app)
     );
-  };
+
+    toast.success("Application status updated");
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    toast.error("Status update failed");
+  }
+};
+
 
   return (
     <AuthContext.Provider value={{

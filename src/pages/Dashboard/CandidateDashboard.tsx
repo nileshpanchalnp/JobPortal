@@ -166,7 +166,7 @@ export default function CandidateDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {userApplications.map((application) => {
-                      const job = getApplicationJob(application.jobId);
+                      const job = getApplicationJob(application._jobId);
                       if (!job) return null;
                       
                       return (
@@ -205,7 +205,7 @@ export default function CandidateDashboard() {
                           
                           <div className="flex space-x-3">
                             <Link
-                              to={`/job/${job.id}`}
+                              to={`/job/${job._id}`}
                               className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
                             >
                               <Eye className="h-4 w-4" />
