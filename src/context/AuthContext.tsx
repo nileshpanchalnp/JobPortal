@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { Server } from '../Server/Server';
 
 export type UserRole = 'candidate' | 'company' | 'admin';
 
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
     try {
-      const response = await axios.post("http://localhost:5000/User/login", {
+      const response = await axios.post(Server + "User/login", {
         email,
         password,
         role,
@@ -89,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string, role: UserRole): Promise<boolean> => {
     try {
-      const response = await axios.post('http://localhost:5000/User/register', {
+      const response = await axios.post(Server + "User/register", {
         name,
         email,
         password,
@@ -134,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const addJob = async (jobData: Omit<Job, 'id' | 'postedDate'>) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("http://localhost:5000/company/create", jobData, {
+      const response = await axios.post(Server +"company/create", jobData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJobs(prev => [response.data.companyPost, ...prev]);
@@ -146,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/company/get");
+      const response = await axios.get(Server +"company/get");
       const data = response.data;
       if (Array.isArray(data)) {
         setJobs(data);
@@ -170,7 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateJob = async (id: string, jobData: Partial<Job>) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:5000/company/update/${id}`, jobData, {
+      const response = await axios.put(Server +`company/update/${id}`, jobData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJobs(prev => prev.map(job => job.id === id ? response.data.updatedCompany : job));
@@ -184,7 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const deleteJob = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/company/delete/${id}`, {
+      await axios.delete(Server +`company/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log("Deleting company ID:", id);
@@ -207,7 +208,7 @@ const applyToJob = async (jobId: string, resume?: File) => {
 
     const token = localStorage.getItem("token");
 
-    const response = await axios.post("http://localhost:5000/candidate/apply", formData, {
+    const response = await axios.post(Server +"candidate/apply", formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -224,7 +225,7 @@ const applyToJob = async (jobId: string, resume?: File) => {
 const fetchApplications = async () => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get("http://localhost:5000/candidate/my-applications", {
+    const response = await axios.get(Server +"candidate/my-applications", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -258,7 +259,7 @@ const fetchCompanyApplications = async () => {
   try {
     const token = localStorage.getItem("token");
 
-    const response = await axios.get("http://localhost:5000/candidate/company-applications", {
+    const response = await axios.get(Server +"candidate/company-applications", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -299,7 +300,7 @@ const bookmarkJob = async (jobId: string) => {
     const token = localStorage.getItem("token");
 
     const response = await axios.post(
-      "http://localhost:5000/bookmark/toggle",
+      Server +"bookmark/toggle",
       { jobId }, // ✅ jobId sent in body as JSON
       {
         headers: {
@@ -329,7 +330,7 @@ const fetchBookmarks = async () => {
   try {
     const token = localStorage.getItem("token");
 
-    const response = await axios.get("http://localhost:5000/bookmark/get", {
+    const response = await axios.get(Server +"bookmark/get", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -360,7 +361,7 @@ const updateApplicationStatus = async (applicationId: string, status: Applicatio
     const token = localStorage.getItem("token");
 
     const response = await axios.put(
-      `http://localhost:5000/candidate/update-status/${applicationId}`,
+      Server +`candidate/update-status/${applicationId}`,
       { status },
       {
         headers: { Authorization: `Bearer ${token}` },

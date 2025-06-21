@@ -9,7 +9,7 @@ export default function CandidateDashboard() {
   const [resume, setResume] = useState<File | null>(null);
 
   const userApplications = applications.filter(app => app.candidateId === user?.id);
-  const savedJobs = jobs.filter(job => bookmarkedJobs.includes(job.id));
+  const savedJobs = jobs.filter(job => bookmarkedJobs.includes(job._id));
 
   const getApplicationJob = (jobId: string) => jobs.find(job => job.id === jobId);
 
@@ -259,7 +259,7 @@ export default function CandidateDashboard() {
                         
                         <div className="flex space-x-3">
                           <Link
-                            to={`/job/${job.id}`}
+                            to={`/job/${job._id}`}
                             className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-center"
                           >
                             View Details
