@@ -21,7 +21,7 @@ const isBookmarked = bookmarkedJobs?.includes(job._id) ?? false;
   };
 
   return (
-    <Link to={`/job/${job.id}`}>
+    <Link to={`/job/${job._id}`}>
       <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-blue-200 group">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center space-x-3">
