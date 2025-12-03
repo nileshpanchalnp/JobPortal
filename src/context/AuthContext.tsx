@@ -99,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { token, user, message } = response.data;
 
-      // ✅ Optional: Show success toast
       toast.success(message || 'Registration successful!');
 
       // ✅ Store token
