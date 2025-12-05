@@ -108,7 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return true;
     } catch (error: any) {
-      // ✅ Optional: Show error toast if message available
       const errorMessage = error?.response?.data?.message || 'Registration failed';
       toast.error(errorMessage);
 

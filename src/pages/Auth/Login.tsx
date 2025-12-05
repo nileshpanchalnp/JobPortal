@@ -116,15 +116,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Demo Credentials Button */}
-          {/* <button
-            type="button"
-            onClick={fillDemoCredentials}
-            className="w-full mb-4 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-          >
-            Use Demo Credentials for {roleOptions.find(r => r.value === role)?.label}
-          </button> */}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
